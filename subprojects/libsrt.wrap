@@ -1,0 +1,4 @@
+[wrap-git]
+directory = libsrt
+url = https://github.com/Haivision/srt.git
+revision = v1.4.2
