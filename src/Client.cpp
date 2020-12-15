@@ -147,7 +147,7 @@ std::optional<Frame> Client::ClientSource::pull() {
 		return std::nullopt;
 
 	auto frame = frame_buffer.front();
-	frame_buffer.pop_back();
+	frame_buffer.pop_front();
 	return frame;
 }
 

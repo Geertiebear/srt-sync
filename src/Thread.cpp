@@ -129,17 +129,21 @@ void ServerThread::handle_accept() {
 
 		int no = 0;
 		srt_setsockflag(their_fd, SRTO_RCVSYN, &no, sizeof(no));
+		auto sink = decoder.get_sink();
+		auto source = client->get_source();
+		decoder.set_from(source->make_connection());
+		client->set_to(sink->make_connection());
 	} else if (stream_id == "pull") {
 		client = std::make_unique<Client>(their_fd, NodeTypes::SINK);
 		modes |= SRT_EPOLL_OUT | SRT_EPOLL_ET;
 
-		if (source_fd) {
+		/* if (source_fd) {
 			auto sink = client->get_sink();
 			auto &source_client = clients[source_fd];
 			auto source = source_client->get_source();
 			client->set_from(source->make_connection());
 			source_client->set_to(sink->make_connection());
-		}
+		} */
 		int no = 0;
 		srt_setsockflag(their_fd, SRTO_SNDSYN, &no, sizeof(no));
 	} else {
@@ -167,6 +171,11 @@ void ServerThread::handle_client_read(int fd) {
 		return;
 	}
 	int ret = source->raise_ready();
+	decoder.sink.raise_ready();
+	auto frame = decoder.source.pull();
+	if (frame)
+		std::cout << "Video time: " << (*frame).video_frame->pts <<
+			" Audio time: " << (*frame).audio_frame->pts << std::endl;
 }
 
 void ServerThread::handle_client_write(int fd) {

@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <memory>
 #include <srt-sync/Client.hpp>
+#include <srt-sync/Decode.hpp>
 
 namespace srt_sync {
 
@@ -15,6 +16,9 @@ public:
 	int setup();
 	int start();
 	int stop();
+
+	//TODO: dirty hack for testing
+	Decode decoder;
 private:
 	void work();
 	void handle_accept();

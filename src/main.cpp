@@ -10,7 +10,6 @@ int main() {
 	thread.setup();
 	thread.start();
 
-
 	while (1) {
 		std::cout << "> " << std::endl;
 		std::string cmd;
@@ -18,6 +17,8 @@ int main() {
 		if (cmd == "stop") {
 			thread.stop();
 			break;
+		} else if (cmd == "probe") {
+			thread.decoder.probe_input();
 		}
 	}
 	srt_cleanup();
