@@ -171,11 +171,8 @@ void ServerThread::handle_client_read(int fd) {
 		return;
 	}
 	int ret = source->raise_ready();
-	decoder.sink.raise_ready();
-	auto frame = decoder.source.pull();
-	if (frame)
-		std::cout << "Video time: " << (*frame).video_frame->pts <<
-			" Audio time: " << (*frame).audio_frame->pts << std::endl;
+
+	decoder.get_sink()->raise_ready();
 }
 
 void ServerThread::handle_client_write(int fd) {

@@ -4,6 +4,7 @@
 #include <srt-sync/DataTypes.hpp>
 #include <optional>
 #include <memory>
+#include <mutex>
 
 namespace srt_sync {
 
@@ -133,7 +134,7 @@ public:
 	: node_sink(node_sink), node_source(node_source), node_type(node_type)
 	{ }
 
-	inline Sink* get_sink() {
+	inline Sink *get_sink() {
 		if (node_type == NodeTypes::SINK || node_type == NodeTypes::SINK_SOURCE)
 			return node_sink;
 		return nullptr;

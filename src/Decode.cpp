@@ -39,6 +39,7 @@ int Decode::DecodeSink::read_callback(void *data, uint8_t *buf, int buf_size) {
 }
 
 int Decode::DecodeSink::raise_ready() {
+	std::unique_lock<std::mutex> lock(decoder.get_lock());
 	if (!decoder.initialized)
 		return 0;
 	packet->data = NULL;
@@ -64,6 +65,7 @@ int Decode::DecodeSink::raise_ready() {
 }
 
 std::optional<AVFrameWrapper> Decode::DecodeSource::pull() {
+	std::unique_lock<std::mutex> lock(decoder.get_lock());
 	if (!decoder.initialized)
 		return std::nullopt;
 	AVFrameWrapper wrapper;
@@ -76,6 +78,7 @@ std::optional<AVFrameWrapper> Decode::DecodeSource::pull() {
 	if (ret < 0)
 		return std::nullopt;
 
+	lock.unlock();
 	decoder.sink.raise_ready();
 
 	return wrapper;
@@ -117,6 +120,7 @@ std::optional<int> Decode::open_codec_context(AVCodecContext **decode_context, e
 }
 
 void Decode::probe_input() {
+	std::unique_lock<std::mutex> lock(ffmpeg_lock);
 	std::cout << "probe_input()" << std::endl;
 	int ret = av_probe_input_buffer2(sink.io_context, &sink.fmt, NULL, NULL, 0, 0);
 	std::cout << "av_probe_input_buffer2(): " << ret << std::endl;
@@ -147,6 +151,7 @@ void Decode::probe_input() {
 	av_dump_format(sink.fmt_context, 0, NULL, 0);
 
 	initialized = true;
+	lock.unlock();
 	sink.raise_ready();
 }
 

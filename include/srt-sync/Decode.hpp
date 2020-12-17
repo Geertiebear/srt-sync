@@ -66,10 +66,14 @@ public:
 
 	void probe_input();
 
+	inline std::mutex &get_lock() {
+		return ffmpeg_lock;
+	}
+
 	Decode()
 	: Node(&sink, &source, NodeTypes::SINK_SOURCE), sink(*this), source(*this)
 	{ }
-public:
+private:
 	ConnectionOut to;
 	ConnectionIn from;
 
@@ -78,6 +82,7 @@ public:
 	DecodeSink sink;
 	DecodeSource source;
 	bool initialized = false;
+	std::mutex ffmpeg_lock;
 
 	std::optional<int> open_codec_context(AVCodecContext **decode_context, enum AVMediaType type);
 };
